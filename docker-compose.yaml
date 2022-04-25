@@ -1,0 +1,38 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    hostname: mysql
+    restart: always
+    environment:
+      # Database used by the java app
+      MYSQL_DATABASE: 'db_example'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'springuser'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'ThePassword'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'Ddixit90@'
+    ports:
+      #map port 3306 of the container to the port 3307 of the host (to test and check with dbeaver or mysql client (optionnal))
+      - '3307:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted: all finaly worked with this:
+    volumes:
+      - /tmp/mysql-container:/var/lib/mysql
+  javaapp:
+    build: .
+    container_name: java-mysql
+    environment:
+      # spring datasources variables since they are not in application.properties
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/db_example"
+      SPRING_DATASOURCE_USERNAME: "springuser"
+      SPRING_DATASOURCE_PASSWORD: "ThePassword"
+    ports:
+      - '8080:8080'
+    depends_on:
+    - db
+# volumes:
+#   my-db:
